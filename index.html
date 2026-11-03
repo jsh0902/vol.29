@@ -50,25 +50,6 @@
   outline-offset: 3px;
 }
 
-  
-    <img src="images/popup.png"
-         alt="29호 행사 홍보 포스터"
-         class="popup-image">
-
-    <button type="button"
-            class="popup-exit"
-            onclick="closePopup()">
-      팝업 나가기
-    </button>
-
-  </div>
-</div>
-
-<script>
-function closePopup() {
-  document.getElementById("popup").style.display = "none";
-}
-</script>
     body{
       margin:0;
       font-family:sans-serif;
@@ -674,5 +655,32 @@ async function releaseWakeLock(){
       ← 이전 호 보기 (28호)
     </a>
   </div> 
+    <!-- 29호 행사 포스터 팝업 -->
+<div id="popup" class="popup-overlay"
+     role="dialog"
+     aria-modal="true"
+     aria-label="행사 홍보 안내">
+
+  <div class="popup-box">
+
+    <img src="images/popup.png"
+         alt="29호 행사 홍보 포스터"
+         class="popup-image">
+
+    <button type="button"
+            class="popup-exit"
+            onclick="closePopup()">
+      팝업 나가기
+    </button>
+
+  </div>
+</div>
+
+<script>
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+}
+</script>
+    
 </body>
 </html>
