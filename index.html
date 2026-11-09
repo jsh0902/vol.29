@@ -525,45 +525,77 @@ async function releaseWakeLock(){
       );
     }
 
-    function getAudioPath(index){
-      return `audio/card${index + 1}.mp3`;
+   function getAudioPath(index){
+  return `audio/card${index + 1}.mp3`;
+}
+
+function getAudioPaths(index){
+  if (index === 5) {
+    return [
+      "audio/card6-1.mp3",
+      "audio/card6-2.mp3"
+    ];
+  }
+  return [getAudioPath(index)];
     }
 
-    function stopCurrentAudio(){
-      if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        currentAudio = null;
+ function stopCurrentAudio(){
+  if (currentAudio) {
+    currentAudio.onended = null;
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+}
+
+function playAudioForSlide(index, onEndCallback){
+  stopCurrentAudio();
+
+  const audioPaths = getAudioPaths(index);
+  let audioIndex = 0;
+
+  function playNextAudio(){
+    if (audioIndex >= audioPaths.length) {
+      currentAudio = null;
+      if (typeof onEndCallback === "function") {
+        onEndCallback();
       }
+      return;
     }
 
-    function playAudioForSlide(index, onEndCallback){
-      stopCurrentAudio();
+    const audio = new Audio(audioPaths[audioIndex]);
+    currentAudio = audio;
+    audioIndex++;
 
-      const audio = new Audio(getAudioPath(index));
-      currentAudio = audio;
+    audio.onplay = function(){
+      updateStatus(
+        `${index + 1}장 음성 ${audioIndex}/${audioPaths.length} 재생 중`
+      );
+    };
 
-      audio.onplay = function(){
-        updateStatus(`${index + 1}장 음성 재생 중`);
-      };
+    audio.onended = function(){
+      if (currentAudio !== audio) return;
+      playNextAudio();
+    };
 
-      audio.onended = function(){
-        if (typeof onEndCallback === "function") {
-          onEndCallback();
-        }
-      };
+    audio.onerror = function(){
+      if (currentAudio !== audio) return;
+      updateStatus("오디오 파일을 불러오지 못했습니다");
+      autoPlay = false;
+      updateAutoPlayButtonState(false);
+    };
 
-      audio.onerror = function(){
-        updateStatus("오디오 파일을 불러오지 못했습니다");
-        updateAutoPlayButtonState(false);
-      };
+    audio.play().catch(() => {
+      if (currentAudio !== audio) return;
+      updateStatus("음성 재생이 차단되었습니다. 재생 버튼을 다시 눌러주세요.");
+      autoPlay = false;
+      updateAutoPlayButtonState(false);
+    });
+  }
 
-      audio.play().catch(() => {
-        updateStatus("자동 재생이 차단되었습니다. 자동 재생 시작 버튼을 다시 눌러주세요.");
-        updateAutoPlayButtonState(false);
-      });
-    }
-
+  playNextAudio();
+}
+    
     function speakCurrentSlide(){
       autoPlay = false;
       updateAutoPlayButtonState(false);
