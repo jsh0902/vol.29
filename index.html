@@ -982,36 +982,105 @@
     updateAutoPlayButtonState(false);
   </script>
 
-  <!-- 행사 포스터 팝업 -->
-  <div
-    id="popup"
-    class="popup-overlay"
-    role="dialog"
-    aria-modal="true"
-    aria-label="행사 홍보 안내">
+<!-- 행사 포스터 팝업 -->
+<div id="popup" class="popup-overlay"
+     role="dialog" aria-modal="true"
+     aria-label="행사 홍보 안내">
+  <div class="popup-box">
 
-    <div class="popup-box">
+    <img
+      src="images/popup.png"
+      alt="라이브 방송 홍보 포스터. 클릭하면 방송 시청창이 열립니다."
+      class="popup-image"
+      onclick="openLive()"
+      style="cursor:pointer;">
 
-      <img
-        src="images/popup.png"
-        alt="29호 행사 홍보 포스터"
-        class="popup-image">
+    <button type="button" class="popup-exit"
+            onclick="openLive()">
+      라이브 시청하기
+    </button>
 
-      <button
-        type="button"
-        class="popup-exit"
-        onclick="closePopup()">
-        팝업 나가기
-      </button>
+    <button type="button" class="popup-exit"
+            onclick="closePopup()"
+            style="background:#6c757d;">
+      팝업 나가기
+    </button>
 
-    </div>
   </div>
+</div>
 
-  <script>
-    function closePopup(){
-      document.getElementById("popup").style.display = "none";
+<!-- 유튜브 라이브 영상창 -->
+<div id="liveModal" class="popup-overlay"
+     style="display:none; z-index:10000;"
+     role="dialog" aria-modal="true"
+     aria-label="유튜브 라이브 시청">
+
+  <div class="popup-box"
+       style="max-width:850px; background:white;
+              border-radius:15px; padding:16px;
+              box-sizing:border-box;">
+
+    <h2>우리동작 유튜브 라이브</h2>
+
+    <div style="width:100%; aspect-ratio:16/9;">
+      <iframe
+        id="livePlayer"
+        title="우리동작 유튜브 라이브"
+        style="width:100%; height:100%; border:0;"
+        allow="encrypted-media; picture-in-picture; fullscreen"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <button type="button" class="popup-exit"
+            onclick="closeLive()">
+      영상 닫기
+    </button>
+
+  </div>
+</div>
+
+<script>
+  // 실제 유튜브 라이브 영상 ID 입력
+  const liveVideoId = "0_MEuH26WoE";
+
+  function closePopup() {
+    document.getElementById("popup").style.display = "none";
+  }
+
+  function openLive() {
+    if (liveVideoId === "여기에_영상ID_입력") {
+      alert("유튜브 라이브 주소가 아직 설정되지 않았습니다.");
+      return;
     }
-  </script>
+
+    // 웹진 음성 재생 정지
+    stopAutoPlay();
+
+    closePopup();
+
+    document.getElementById("livePlayer").src =
+      "https://www.youtube.com/embed/" +
+      encodeURIComponent(liveVideoId) +
+      "?autoplay=0";
+
+    document.getElementById("liveModal").style.display = "flex";
+    document.querySelector("#liveModal button").focus();
+  }
+
+  function closeLive() {
+    document.getElementById("liveModal").style.display = "none";
+    document.getElementById("livePlayer").src = "";
+    document.getElementById("autoplayBtn").focus();
+  }
+
+  document.addEventListener("keydown", function(event) {
+    if (event.key === "Escape" &&
+        document.getElementById("liveModal").style.display === "flex") {
+      closeLive();
+    }
+  });
+</script>
 
 </body>
 </html>
